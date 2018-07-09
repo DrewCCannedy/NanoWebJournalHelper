@@ -4,11 +4,21 @@ import glob
 import os
 import win32com.client as win32
 
+
 class Journal_Line:
     def __init__(self, cost_center, ammount, description):
         self.cost_center = cost_center
         self.ammount = ammount
         self.description = description
+
+
+def find_cc(journal_lines, cc, des):
+    if journal_lines == []:
+        return -1
+    for line in journal_lines:
+        if line.cost_center == cc and line.description == des:
+            return journal_lines.index(line)
+    return -1
 
 
 def write_template(date):
@@ -25,7 +35,9 @@ def write_template(date):
     try:
         jrnl1 = xl.Workbooks.Open(jrnl1path)
     except:
-        return "Error finding Copy file. Make sure it is in the JRNL1 folder\nAlso Make sure the Journals Folder is in 'Local Disk (C)'\n"
+        des = "Error finding Copy file. Make sure it is in the JRNL1 folder\n"
+        des += "Also Make sure the Journals Folder is in 'Local Disk (C)'\n"
+        return des
     total_ammount = 0
     current_line = 1
     path = 'C:\\Journals\\' + date
@@ -35,24 +47,19 @@ def write_template(date):
         sheets = wb.Sheets
         ammount = 0
         cc = ""
-        cc_exists = False
         for sheet in sheets:
-            for journal_line in journal_lines:
-                if cc == journal_line.cost_center:
-                    cc_exists = True
-            temp = sheet.Cells(2,1).Value
+            temp = sheet.Cells(2, 1).Value
             temp = temp.split(' ')
             name = temp[1]
-            cc = sheet.Cells(1,6).Value
-            ammount = sheet.Cells(2,6).Value
+            cc = sheet.Cells(1, 6).Value
+            ammount = sheet.Cells(2, 6).Value
             description = "{}, {} {}".format(name, month, year)
-            if not cc_exists:
+            cc_exists = find_cc(journal_lines, cc, description)
+            if cc_exists == -1:
                 journal_lines.append(Journal_Line(cc, ammount, description))
-            else: 
-                for journal_line in journal_lines:
-                    if journal_line.cost_center == cc:
-                        journal_line.ammount += ammount
-            cc_exists = False
+            else:
+                journal_lines[cc_exists].ammount += ammount
+
     for journal_line in journal_lines:
         jrnl1.Sheets(1).Cells(current_line, 1).Value = 'DAL01'
         jrnl1.Sheets(1).Cells(current_line, 3).Value = 'ACTUALS'
@@ -73,7 +80,7 @@ def write_template(date):
     jrnl1.Save()
     xl.Application.Quit()
     return "Monthly Report Created!"
-    
+
 
 def number_to_date(num):
     if num == 1:

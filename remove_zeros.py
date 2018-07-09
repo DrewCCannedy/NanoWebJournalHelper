@@ -5,6 +5,7 @@ import os.path
 import win32com.client as win32
 import decimal
 
+
 def remove_zeros(date):
     """Pass a folder of Excel Files."""
     output_string = ""

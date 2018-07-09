@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['NanoWeb_Journal_Helper.py'],
-             pathex=['C:\\Users\\Drew Cannedy\\Desktop\\NanoWeb_Journal_Helper'],
+             pathex=['C:\\Users\\drewc\\Desktop\\NanoWeb_Journal_Helper'],
              binaries=[],
              datas=[],
              hiddenimports=[],
